@@ -1,0 +1,44 @@
+---
+interface Props {
+  name: string;
+  benefits: string[];
+  accentColor: string;
+  progress: string;
+  roomId: string;
+  tagline: string;
+}
+
+const { name, benefits, accentColor, progress, roomId, tagline } = Astro.props;
+---
+
+<div id={`card-${roomId}`} class="text-panel max-w-lg">
+  <!-- Progress label -->
+  <div class="room-text mb-4 md:mb-5">
+    <span class="text-sm uppercase tracking-[0.3em] font-medium" style={`color: ${accentColor};`}>
+      Ingredient {progress}
+    </span>
+  </div>
+
+  <!-- Accent line -->
+  <div class="room-text h-[2px] w-16 md:w-24 mb-3 md:mb-4" style={`background: ${accentColor};`}></div>
+
+  <!-- Name -->
+  <h2 class="room-text text-5xl md:text-7xl lg:text-8xl font-black leading-none mb-3 md:mb-5 text-[#000000]">
+    {name}
+  </h2>
+
+  <!-- Tagline -->
+  <p class="room-text text-base md:text-lg font-medium text-[#000000]/50 mb-4 md:mb-5 max-w-sm">
+    {tagline}
+  </p>
+
+  <!-- Benefits -->
+  <ul class="space-y-2.5 md:space-y-3">
+    {benefits.map((benefit) => (
+      <li class="room-text flex items-start gap-3 text-base md:text-lg text-[#000000]/70">
+        <span class="mt-1.5 block w-2 h-2 rounded-full flex-shrink-0" style={`background: ${accentColor};`}></span>
+        <span>{benefit}</span>
+      </li>
+    ))}
+  </ul>
+</div>

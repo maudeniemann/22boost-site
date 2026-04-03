@@ -1,0 +1,706 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-black: #000000;
+  --brand-white: #ffffff;
+  --text-primary: #000000;
+  --text-secondary: rgba(0, 0, 0, 0.6);
+  --text-muted: rgba(0, 0, 0, 0.35);
+
+  --room-width: 1600px;
+  --room-height: 900px;
+  --room-depth: 2500px;
+  --room-half-w: 800px;
+  --room-half-h: 450px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background: #ffffff;
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* ============================================
+   3D Room Viewport
+   ============================================ */
+#room-viewport {
+  position: fixed;
+  inset: 0;
+  perspective: 1000px;
+  perspective-origin: 50% 50%;
+  overflow: hidden;
+  background: #ffffff;
+  z-index: 0;
+}
+
+#camera-rig {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: translateZ(0px);
+  will-change: transform;
+}
+
+/* ============================================
+   Room Surfaces
+   ============================================ */
+
+.room-back-wall {
+  position: absolute;
+  width: var(--room-width);
+  height: var(--room-height);
+  margin-left: calc(var(--room-half-w) * -1);
+  margin-top: calc(var(--room-half-h) * -1);
+  transform: translateZ(calc(var(--room-depth) * -1));
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 40%, #eeeeee 100%);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+}
+
+.room-floor-plane {
+  position: absolute;
+  width: var(--room-width);
+  height: var(--room-depth);
+  margin-left: calc(var(--room-half-w) * -1);
+  top: var(--room-half-h);
+  transform-origin: center top;
+  transform: rotateX(-90deg);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 78px,
+      rgba(0, 0, 0, 0.04) 78px,
+      rgba(0, 0, 0, 0.04) 80px
+    ),
+    linear-gradient(180deg, #d0d0d0 0%, #b8b8b8 30%, #a0a0a0 60%, #909090 100%);
+}
+
+.room-ceiling-plane {
+  position: absolute;
+  width: var(--room-width);
+  height: var(--room-depth);
+  margin-left: calc(var(--room-half-w) * -1);
+  bottom: var(--room-half-h);
+  transform-origin: center bottom;
+  transform: rotateX(90deg);
+  background: #ffffff;
+  overflow: visible;
+}
+
+.skylight-glow {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 1200px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(240, 240, 240, 0.4) 40%,
+    transparent 70%
+  );
+  animation: skylight-pulse 6s ease-in-out infinite alternate;
+}
+
+@keyframes skylight-pulse {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+.room-wall-left {
+  position: absolute;
+  width: var(--room-depth);
+  height: var(--room-height);
+  margin-top: calc(var(--room-half-h) * -1);
+  left: calc(var(--room-half-w) * -1);
+  transform-origin: left center;
+  transform: rotateY(90deg);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 50%, #ebebeb 100%);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.04);
+}
+
+.room-wall-right {
+  position: absolute;
+  width: var(--room-depth);
+  height: var(--room-height);
+  margin-top: calc(var(--room-half-h) * -1);
+  left: var(--room-half-w);
+  transform-origin: left center;
+  transform: rotateY(-90deg);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 50%, #ebebeb 100%);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.04);
+}
+
+/* ============================================
+   Content Planes — positioned in 3D space
+   ============================================ */
+.content-plane {
+  position: absolute;
+  transform-style: preserve-3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1000px;
+  margin-left: -500px;
+  margin-top: -120px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.content-plane input,
+.content-plane button,
+.content-plane a {
+  pointer-events: auto;
+}
+
+.content-plane.ingredient-left {
+  width: 620px;
+  margin-left: -740px;
+}
+
+.content-plane.ingredient-center {
+  width: 700px;
+  margin-left: -350px;
+}
+
+.content-plane.ingredient-right {
+  width: 620px;
+  margin-left: 140px;
+}
+
+/* Tagline planes */
+.tagline-plane {
+  position: absolute;
+  width: 1200px;
+  margin-left: -600px;
+  text-align: center;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  opacity: 0;
+  pointer-events: none;
+  font-size: 1.3rem;
+}
+
+@media (min-width: 768px) {
+  .tagline-plane {
+    font-size: 2rem;
+  }
+}
+
+/* Frosted glass text panel */
+.text-panel {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 1.5rem;
+  padding: 3rem 3.5rem;
+  max-height: 80vh;
+  overflow-y: auto;
+  will-change: transform, opacity;
+  transform-origin: center center;
+}
+
+/* ============================================
+   Room Decoration — shelves, plants
+   ============================================ */
+.deco-layer {
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: 0;
+  top: 0;
+  transform-style: preserve-3d;
+}
+
+.shelf {
+  position: absolute;
+  height: 8px;
+  background: linear-gradient(180deg, #999999 0%, #888888 50%, #777777 100%);
+  border-radius: 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.shelf-left {
+  width: 180px;
+  left: -750px;
+  top: -80px;
+}
+
+.shelf-right {
+  width: 180px;
+  left: 570px;
+  top: -120px;
+}
+
+.shelf.short {
+  width: 120px;
+}
+
+.shelf::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 20%;
+  width: 18px;
+  height: 40px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.15) 100%);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 4px 4px 2px 2px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.shelf-right::after {
+  left: auto;
+  right: 25%;
+}
+
+.plant {
+  position: absolute;
+  width: 60px;
+  height: 80px;
+  border-radius: 50% 0 50% 50%;
+  opacity: 0.5;
+}
+
+.plant-left-1 {
+  background: radial-gradient(ellipse, #b0b0b0 20%, #888888 60%, transparent 100%);
+  left: -740px;
+  top: -140px;
+  transform: rotate(-15deg);
+}
+
+.plant-right-1 {
+  background: radial-gradient(ellipse, #b0b0b0 20%, #888888 60%, transparent 100%);
+  left: 680px;
+  top: -180px;
+  width: 50px;
+  height: 70px;
+  transform: rotate(20deg) scaleX(-1);
+}
+
+.plant-left-2 {
+  background: radial-gradient(ellipse, #c8c8c8 20%, #a0a0a0 60%, transparent 100%);
+  left: -720px;
+  top: -50px;
+  width: 45px;
+  height: 65px;
+  transform: rotate(-25deg);
+}
+
+.plant-right-2 {
+  background: radial-gradient(ellipse, #c8c8c8 20%, #a0a0a0 60%, transparent 100%);
+  left: 660px;
+  top: -90px;
+  width: 55px;
+  height: 75px;
+  transform: rotate(10deg) scaleX(-1);
+}
+
+.plant-floor-left {
+  background: radial-gradient(ellipse, #999999 30%, #666666 70%, transparent 100%);
+  left: -680px;
+  top: 250px;
+  width: 80px;
+  height: 120px;
+  transform: rotate(-5deg);
+  opacity: 0.6;
+}
+
+.plant-floor-right {
+  background: radial-gradient(ellipse, #999999 30%, #666666 70%, transparent 100%);
+  left: 600px;
+  top: 220px;
+  width: 90px;
+  height: 130px;
+  transform: rotate(8deg) scaleX(-1);
+  opacity: 0.6;
+}
+
+/* ============================================
+   Scroll Hint
+   ============================================ */
+.scroll-hint {
+  position: fixed;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.scroll-hint.hidden {
+  opacity: 0;
+}
+
+.scroll-hint svg {
+  animation: scroll-bounce 1.5s ease-in-out infinite;
+}
+
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+/* ============================================
+   Waitlist Bar — fixed top
+   ============================================ */
+.waitlist-bar {
+  position: fixed;
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  padding: 0.3rem;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 100px;
+}
+
+.waitlist-form {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.waitlist-input {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.6);
+  outline: none;
+  width: 180px;
+  color: #000;
+}
+
+.waitlist-input::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.waitlist-input:focus {
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.waitlist-btn {
+  padding: 0.4rem 1rem;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.waitlist-btn:hover {
+  opacity: 0.85;
+}
+
+.waitlist-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.waitlist-msg {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.waitlist-msg--success {
+  color: #000;
+}
+
+.waitlist-msg--error {
+  color: #888;
+}
+
+/* ============================================
+   Controls Bar
+   ============================================ */
+.controls-bar {
+  position: fixed;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.control-btn svg {
+  width: 10px;
+  height: 10px;
+}
+
+.control-btn:hover {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.control-btn:focus-visible {
+  outline: 1px solid var(--text-primary);
+  outline-offset: 1px;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  width: 120px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 1px;
+  cursor: pointer;
+  position: relative;
+}
+
+.progress-track:hover {
+  height: 3px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 1px;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+.skip-dots {
+  display: none;
+}
+
+.skip-dot {
+  display: none;
+}
+
+.time-display {
+  display: none;
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  #room-viewport {
+    perspective: none;
+  }
+
+  #camera-rig {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    transform-style: flat;
+  }
+
+  .room-floor-plane,
+  .room-ceiling-plane,
+  .room-wall-left,
+  .room-wall-right,
+  .room-back-wall,
+  .deco-layer {
+    display: none;
+  }
+
+  .content-plane {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 2rem;
+    min-height: 80vh;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .tagline-plane {
+    position: relative;
+    width: 100%;
+    margin: 2rem 0;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  html, body {
+    overflow: auto;
+  }
+
+  .controls-bar, .scroll-hint {
+    display: none;
+  }
+}
+
+/* ============================================
+   Mobile — flat scrollable layout
+   ============================================ */
+@media (max-width: 767px) {
+  html, body {
+    overflow: auto;
+    overflow-x: hidden;
+    height: auto;
+  }
+
+  #room-viewport {
+    position: relative;
+    inset: auto;
+    perspective: none;
+    overflow: visible;
+    min-height: 100vh;
+  }
+
+  #camera-rig {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    transform-style: flat;
+  }
+
+  .room-floor-plane,
+  .room-ceiling-plane,
+  .room-wall-left,
+  .room-wall-right,
+  .room-back-wall,
+  .deco-layer {
+    display: none;
+  }
+
+  .content-plane {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem;
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: none !important;
+    opacity: 1 !important;
+    pointer-events: auto;
+  }
+
+  .content-plane.ingredient-left,
+  .content-plane.ingredient-center,
+  .content-plane.ingredient-right {
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 1.25rem;
+    min-height: auto;
+  }
+
+  .tagline-plane {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 1.5rem 1.25rem;
+    transform: none !important;
+    opacity: 1 !important;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .text-panel {
+    padding: 1.5rem 1.25rem;
+    border-radius: 1rem;
+    max-height: none;
+    overflow-y: visible;
+    background: rgba(255, 255, 255, 0.9);
+    width: 100%;
+  }
+
+  /* Waitlist bar: compact for mobile */
+  .waitlist-bar {
+    top: 0.5rem;
+    padding: 0.2rem;
+    max-width: calc(100vw - 1rem);
+  }
+
+  .waitlist-input {
+    width: 120px;
+    min-width: 0;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.7rem;
+  }
+
+  .waitlist-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.6rem;
+  }
+
+  .controls-bar, .scroll-hint {
+    display: none;
+  }
+}

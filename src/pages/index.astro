@@ -1,0 +1,94 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Room from '../components/Room.astro';
+import Hero from '../components/Hero.astro';
+import Problem from '../components/Problem.astro';
+import Ingredient from '../components/Ingredient.astro';
+import ProductReveal from '../components/ProductReveal.astro';
+import CTA from '../components/CTA.astro';
+import Controls from '../components/Controls.astro';
+import WaitlistBar from '../components/WaitlistBar.astro';
+---
+
+<Layout>
+  <!-- Always-visible waitlist -->
+  <WaitlistBar />
+  <Room>
+    <!-- Hero — closest to camera entry -->
+    <div class="content-plane" id="plane-hero" data-room="hero" style="transform: translateZ(100px);">
+      <Hero />
+    </div>
+
+    <!-- Problem — early in the walk -->
+    <div class="content-plane" id="plane-problem" data-room="problem" style="transform: translateZ(-300px);">
+      <Problem />
+    </div>
+
+    <!-- Three ingredient walls — fanned arrangement -->
+    <div class="content-plane ingredient-left" id="plane-yerba-mate" data-room="yerba-mate" style="transform: translateX(-100px) translateZ(-1300px) rotateY(16deg);">
+      <Ingredient
+        roomId="yerba-mate"
+        name="Yerba Mate"
+        accentColor="#000000"
+        progress="1 / 3"
+        tagline="Clean natural caffeine. Balanced energy. No jitters."
+        benefits={[
+          'Natural caffeine — no synthetic stimulation',
+          'Clean lift. No spike. No drop.',
+          'Sharp focus without the chaos',
+        ]}
+      />
+    </div>
+
+    <div class="content-plane ingredient-center" id="plane-l-theanine" data-room="l-theanine" style="transform: translateZ(-1700px);">
+      <Ingredient
+        roomId="l-theanine"
+        name="L-Theanine"
+        accentColor="#555555"
+        progress="2 / 3"
+        tagline="Calm focused alertness. Smooth stimulation. No crashes."
+        benefits={[
+          'Makes caffeine smoother',
+          'Calm, locked-in focus',
+          'Flow state, not overstimulation',
+        ]}
+      />
+    </div>
+
+    <div class="content-plane ingredient-right" id="plane-rhodiola" data-room="rhodiola" style="transform: translateX(100px) translateZ(-1300px) rotateY(-16deg);">
+      <Ingredient
+        roomId="rhodiola"
+        name="Rhodiola Rosea"
+        accentColor="#999999"
+        progress="3 / 3"
+        tagline="Mental endurance under stress. Sustained performance all day."
+        benefits={[
+          'Endurance for your brain',
+          'Fights fatigue under pressure',
+          'Performs when stress hits',
+        ]}
+      />
+    </div>
+
+    <!-- Tagline banners — above and below ingredient walls -->
+    <div class="tagline-plane" id="tagline-top" style="transform: translateZ(-1500px) translateY(-360px);">
+      Smooth Energy Not A Spike
+    </div>
+    <div class="tagline-plane" id="tagline-bottom" style="transform: translateZ(-1500px) translateY(360px);">
+      Crash-Free Performance Start To Finish
+    </div>
+
+    <!-- Product reveal — past the three walls -->
+    <div class="content-plane" id="plane-product" data-room="product" style="transform: translateZ(-2000px);">
+      <ProductReveal />
+    </div>
+
+    <!-- CTA — deepest point, camera stops here -->
+    <div class="content-plane" id="plane-cta" data-room="cta" style="transform: translateZ(-2200px);">
+      <CTA />
+    </div>
+  </Room>
+
+  <!-- Playback controls — fixed outside 3D scene -->
+  <Controls />
+</Layout>

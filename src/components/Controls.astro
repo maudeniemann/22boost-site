@@ -1,0 +1,48 @@
+---
+const sections = [
+  { id: 'hero', label: 'Home' },
+  { id: 'problem', label: 'Why' },
+  { id: 'yerba-mate', label: 'Yerba Mate' },
+  { id: 'l-theanine', label: 'L-Theanine' },
+  { id: 'rhodiola', label: 'Rhodiola' },
+  { id: 'product', label: 'Product' },
+  { id: 'cta', label: 'Join' },
+];
+---
+
+<div class="controls-bar" role="navigation" aria-label="Experience controls">
+  <!-- Play/Pause -->
+  <button
+    id="play-pause"
+    class="control-btn"
+    aria-label="Pause"
+    title="Play/Pause (Space)"
+  >
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+      <rect x="3" y="2" width="3.5" height="12" rx="1"/>
+      <rect x="9.5" y="2" width="3.5" height="12" rx="1"/>
+    </svg>
+  </button>
+
+  <!-- Progress bar -->
+  <div class="progress-container">
+    <div id="progress-track" class="progress-track" role="progressbar" aria-label="Journey progress">
+      <div id="progress-fill" class="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Skip dots -->
+  <div class="skip-dots">
+    {sections.map((section, i) => (
+      <button
+        class:list={['skip-dot', { active: i === 0 }]}
+        data-target={section.id}
+        title={section.label}
+        aria-label={`Skip to ${section.label}`}
+      />
+    ))}
+  </div>
+
+  <!-- Time display -->
+  <span id="time-display" class="time-display">0s / 30s</span>
+</div>

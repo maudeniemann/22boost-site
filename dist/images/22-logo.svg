@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <circle cx="100" cy="100" r="95" fill="#000" stroke="#fff" stroke-width="2"/>
+  <!-- Top half - white background -->
+  <clipPath id="top-half">
+    <rect x="0" y="0" width="200" height="100"/>
+  </clipPath>
+  <circle cx="100" cy="100" r="95" fill="#fff" clip-path="url(#top-half)"/>
+  <!-- Top "2" - black on white -->
+  <text x="100" y="85" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="72" fill="#000">2</text>
+  <!-- Bottom "2" - white on black -->
+  <text x="100" y="160" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="72" fill="#fff">2</text>
+</svg>
